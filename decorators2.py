@@ -1,24 +1,14 @@
 """
-Using decorators that take arguments
+Using decorators that take arguments.
 """
 
 import pandas as pd
 import functools
 
 
-def decorator(arg1, arg2):
-    def real_decorator(function):
-        def wrapper(*args, **kwargs):
-            print(arg1)
-            rv = function(*args, **kwargs)
-            print(arg2)
-            return rv
-        return wrapper
-    return real_decorator
-
-
 def setName(name):
     def real_decorator(func):
+        @functools.wraps(func)
         def wrapper(*args, **kwargs):
             rv = func(*args, **kwargs)
             rv._name = name
@@ -27,16 +17,42 @@ def setName(name):
     return real_decorator
 
 
-@decorator("arg1", "arg2")
-def print_name(name):
-    return name.upper()
+def printMessage(mess):
+    def real_decorator(func):
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs):
+            rv = func(*args, **kwargs)
+            print(mess)
+            return rv
+        return wrapper
+    return real_decorator
 
 
-@setName('this is its name')
-def make_df():
-    df = pd.DataFrame({
-        'a':[1, 2, 3],
-        'b':[4, 5, 6]
-    })
+class Wrangle:
+    """
+    Houses data wrangling methods
+    """
 
-    return df
+    @staticmethod
+    @printMessage('Printing df1')
+    @setName('this is its name')
+    def make_df():
+        df = pd.DataFrame({
+            'a':[1, 2, 3],
+            'b':[4, 5, 6]
+        })
+
+        return df
+
+    @staticmethod
+    @printMessage('Printing df2')
+    @setName('filtered version')
+    def filter_df():
+        df = Wrangle.make_df().query('a == 2')
+
+        return df
+
+
+if __name__ == "__main__":
+    x = Wrangle.filter_df()
+    y = Wrangle.make_df()
