@@ -1,2 +1,2 @@
 # notes
-Notes on python
+Notes on python, in a semi-organized fashion.
